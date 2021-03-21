@@ -1,0 +1,61 @@
+services:
+  mongodb1:
+    image: 'docker.io/bitnami/mongodb:4.4-debian-10'
+    privileged: true
+    user: root
+    environment:
+      - MONGODB_ADVERTISED_HOSTNAME=mongodb1
+      - MONGODB_REPLICA_SET_MODE=primary
+      - MONGODB_ROOT_PASSWORD=${mypassword}
+      - MONGODB_REPLICA_SET_KEY=${randomkey}
+    expose:
+      - 27011
+    ports:
+      - 27011:27011
+    restart: always
+    volumes: 
+      - ~/mongo/data1:/bitnami/mongodb/data/db
+      - ~/mongo/data1/dump:/dump
+
+  mongodb2:
+    image: 'docker.io/bitnami/mongodb:4.4-debian-10'
+    privileged: true
+    user: root
+    depends_on:
+      - mongodb1
+    environment:
+      - MONGODB_ADVERTISED_HOSTNAME=mongodb2
+      - MONGODB_REPLICA_SET_MODE=secondary
+      - MONGODB_INITIAL_PRIMARY_HOST=mongodb1
+      - MONGODB_INITIAL_PRIMARY_ROOT_PASSWORD=${mypassword}
+      - MONGODB_REPLICA_SET_KEY=${randomkey}
+    expose:
+      - 27012
+    ports:
+      - 27012:27012
+    restart: always
+    volumes: 
+      - ~/mongo/data2:/bitnami/mongodb/data/db
+      - ~/mongo/data2/dump:/dump
+
+
+  mongodb3:
+    image: 'docker.io/bitnami/mongodb:4.4-debian-10'
+    privileged: true
+    user: root
+    depends_on:
+      - mongodb1
+    environment:
+      - MONGODB_ADVERTISED_HOSTNAME=mongodb3
+      - MONGODB_REPLICA_SET_MODE=arbiter
+      - MONGODB_INITIAL_PRIMARY_HOST=mongodb1
+      - MONGODB_INITIAL_PRIMARY_ROOT_PASSWORD=${mypassword}
+      - MONGODB_REPLICA_SET_KEY=${randomkey}
+    expose:
+      - 27013
+    ports:
+      - 27013:27013
+    restart: always
+    volumes: 
+      - ~/mongo/data3:/bitnami/mongodb/data/db
+      - ~/mongo/data3/dump:/dump

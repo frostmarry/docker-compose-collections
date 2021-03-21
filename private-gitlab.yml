@@ -1,0 +1,19 @@
+version: '3.7'
+services:
+    private_gitlab:
+        image: 'gitlab/gitlab-ce'
+        restart: always
+        container_name: private_gitlab
+        hostname: 'private_gitlab.example.com'
+        environmen:
+          GITLAB_OMNIBUS_CONFIG: |
+            external_url 'private_gitlab.example.com' #you can change it to ip:port
+            gitlab_rails['gitlab_shell_ssh_port'] = 8080 #optional tbh, but the default is 22
+        ports:
+        - '80:80' #make sure the value is the same as the external url
+        - '8080:22'
+        - '443:443'        
+        volumes:
+        - '$GITLAB_HOME/config:/etc/gitlab'
+        - '$GITLAB_HOME/logs:/var/log/gitlab'
+        - '$GITLAB_HOME/data:/var/opt/gitlab'
